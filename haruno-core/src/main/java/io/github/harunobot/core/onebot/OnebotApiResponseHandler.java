@@ -92,9 +92,15 @@ public class OnebotApiResponseHandler implements com.lmax.disruptor.EventHandler
                 LOG.warn("handleApi sequence: {} endOfBatch: {} {}", sequence, endOfBatch, objectMapper.writeValueAsString(apiResponse));  
                 MDC.clear();
             } catch (JsonProcessingException ex) {
+                LOG.error("", ex);
+                return;
             }
         }
-        protoHandler.handleApiResponse(apiResponse);
+        try {
+            protoHandler.handleApiResponse(apiResponse);
+        } catch (Exception ex) {
+            LOG.error("", ex);
+        }
     }
     
     

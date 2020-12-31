@@ -5,7 +5,7 @@
  */
 package io.github.harunobot.plugin.data;
 
-import io.github.harunobot.plugin.data.type.PluginRecivevType;
+import io.github.harunobot.plugin.data.type.PluginReceivedType;
 import io.github.harunobot.plugin.data.type.PluginMatcherType;
 import io.github.harunobot.plugin.data.type.PluginTextType;
 
@@ -16,17 +16,17 @@ import io.github.harunobot.plugin.data.type.PluginTextType;
 public class PluginHandlerMatcher {
     private final PluginTextType textType;
     private final PluginMatcherType matcherType;
-    private final PluginRecivevType recivevType;
+    private final PluginReceivedType recivevType;
     private final String trait;
     
-    public PluginHandlerMatcher(PluginRecivevType recivevType, PluginMatcherType matcherType, PluginTextType textType, String trait){
+    public PluginHandlerMatcher(PluginReceivedType recivevType, PluginMatcherType matcherType, PluginTextType textType, String trait){
         this.recivevType = recivevType;
         this.textType = textType;
         this.matcherType = matcherType;
         this.trait = trait;
     }
     
-    public PluginRecivevType recivevType(){
+    public PluginReceivedType recivevType(){
         return recivevType;
     }
     

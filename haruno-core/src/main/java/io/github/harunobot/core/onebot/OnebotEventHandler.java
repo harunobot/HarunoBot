@@ -61,31 +61,36 @@ public class OnebotEventHandler implements com.lmax.disruptor.EventHandler<Onebo
                 MDC.clear();
                 return;
             } catch (JsonProcessingException ex) {
-                
+                LOG.error("", ex);
+                return;
             }
         }
-        switch(event.getPostType()){
-            case META:
-                protoHandler.handleMetaEventMessage(event);
-                break;
-            case NOTICE:
-                protoHandler.handleNoticeMessage(event);
-                break;
-            case REQUEST:
-                protoHandler.handleRequestMessage(event);
-                break;
-            case MESSAGE:
-                if(event.getMessageType() == MessageType.PRIVATE){
-                    protoHandler.handlePrivateMessage(event);
+        try {
+            switch(event.getPostType()){
+                case META:
+                    protoHandler.handleMetaEventMessage(event);
                     break;
-                }
-                if(event.getMessageType() == MessageType.GROUP){
-                    protoHandler.handleGroupMessage(event);
+                case NOTICE:
+                    protoHandler.handleNoticeMessage(event);
                     break;
-                }
-            default:
-                protoHandler.handleDefaultMessage(event);
-                break;
+                case REQUEST:
+                    protoHandler.handleRequestMessage(event);
+                    break;
+                case MESSAGE:
+                    if(event.getMessageType() == MessageType.PRIVATE){
+                        protoHandler.handlePrivateMessage(event);
+                        break;
+                    }
+                    if(event.getMessageType() == MessageType.GROUP){
+                        protoHandler.handleGroupMessage(event);
+                        break;
+                    }
+                default:
+                    protoHandler.handleDefaultMessage(event);
+                    break;
+            }
+        } catch (Exception ex) {
+            LOG.error("", ex);
         }
     }
     

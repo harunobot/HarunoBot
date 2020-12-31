@@ -43,7 +43,11 @@ public class OnebotApiHandler implements com.lmax.disruptor.EventHandler<StringB
     @Override
     public void onEvent(StringBuilder sb, long sequence, boolean endOfBatch) throws Exception {
         MDC.put("module", "OnebotApiHandler");
-        ctx.writeTextMessage(sb.toString());
+        try{
+            ctx.writeTextMessage(sb.toString());
+        }catch(Exception ex){
+            LOG.error("", ex);
+        }
         MDC.clear();
     }
     

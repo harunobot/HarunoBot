@@ -15,6 +15,7 @@ import io.vertx.core.http.WebSocketConnectOptions;
 import java.util.concurrent.TimeUnit;
 import io.github.harunobot.core.onebot.OnebotReceptionManager;
 import io.github.harunobot.core.onebot.OnebotTransmissionManager;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -33,6 +34,7 @@ public class OnebotClientAdapter extends AbstractVerticle {
     private final String uri;
     private final OnebotReceptionManager receptionManager;
     private final OnebotTransmissionManager transmissionManager;
+    private final AtomicBoolean restarting = new AtomicBoolean(false);
     
     private OnebotClientAdapter(Builder builder){
         this.authorization = builder.authorization;
@@ -113,8 +115,9 @@ public class OnebotClientAdapter extends AbstractVerticle {
                 }).exceptionHandler((e) -> {
                     MDC.put("module", "OnebotClientAdapter");
 //                    System.out.println("Error, restarting in 5 seconds");
-                    LOG.error("Error, restarting in 5 seconds", e);
-                    restart(client, 5);
+                    LOG.error("Error, closing client", e);
+//                    restart(client, 5);
+                    client.close();
                     MDC.clear();
                 }).closeHandler((__) -> {
                     MDC.put("module", "OnebotClientAdapter");
@@ -134,8 +137,14 @@ public class OnebotClientAdapter extends AbstractVerticle {
     }
     
     private void restart(HttpClient client, int delay) {
+//        synchronized
+        if(restarting.get()){
+            return;
+        }
+        restarting.set(true);
         client.close();
         vertx.setTimer(TimeUnit.SECONDS.toMillis(delay), (__) -> {
+            restarting.set(false);
             startClient(vertx);
         });
     }

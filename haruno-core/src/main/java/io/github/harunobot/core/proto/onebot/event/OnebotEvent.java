@@ -60,8 +60,11 @@ public class OnebotEvent {
     private String rawMessage;
     @JsonProperty(value="sender_id")
     private long senderId;
+    @JsonProperty(value="real_id")
+    private long realId;
     @JsonDeserialize(using = MessageDeserializer.class)
     private Object message;
+    private boolean group;
     private Anonymous anonymous;
     private OnebotFile file;
     private long duration;
@@ -73,6 +76,10 @@ public class OnebotEvent {
     private int font;
     @JsonProperty(value="_post_method")
     private int postMethod;
+    @JsonProperty(value="card_new")
+    private String groupCardNew;
+    @JsonProperty(value="card_old")
+    private String groupCardOld;
 
     /**
      * @return the time
@@ -450,6 +457,62 @@ public class OnebotEvent {
      */
     public void setSenderId(long senderId) {
         this.senderId = senderId;
+    }
+
+    /**
+     * @return the groupCardNew
+     */
+    public String getGroupCardNew() {
+        return groupCardNew;
+    }
+
+    /**
+     * @param groupCardNew the groupCardNew to set
+     */
+    public void setGroupCardNew(String groupCardNew) {
+        this.groupCardNew = groupCardNew;
+    }
+
+    /**
+     * @return the groupCardOld
+     */
+    public String getGroupCardOld() {
+        return groupCardOld;
+    }
+
+    /**
+     * @param groupCardOld the groupCardOld to set
+     */
+    public void setGroupCardOld(String groupCardOld) {
+        this.groupCardOld = groupCardOld;
+    }
+
+    /**
+     * @return the group
+     */
+    public boolean isGroup() {
+        return group;
+    }
+
+    /**
+     * @param group the group to set
+     */
+    public void setGroup(boolean group) {
+        this.group = group;
+    }
+
+    /**
+     * @return the realId
+     */
+    public long getRealId() {
+        return realId;
+    }
+
+    /**
+     * @param realId the realId to set
+     */
+    public void setRealId(long realId) {
+        this.realId = realId;
     }
     
 }

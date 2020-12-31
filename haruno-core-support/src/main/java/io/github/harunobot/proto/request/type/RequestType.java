@@ -14,7 +14,11 @@ public enum RequestType {
     MESSAGE_PUBLIC,
     MUTE,
     DELETE,
-    DELETE_AND_MUTE,
+    
+    GET_MESSAGE,
+    
+    HANDLE_SOCIAL_ADD_REQUEST,
+    KICK_MEMBER,
     
     ;
 }

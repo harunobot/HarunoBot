@@ -5,18 +5,19 @@
  */
 package io.github.harunobot.proto.event;
 
+import io.github.harunobot.pojo.type.Permission;
 import io.github.harunobot.proto.event.type.EventType;
 import io.github.harunobot.proto.event.type.SourceType;
-import io.github.harunobot.proto.event.type.SenderType;
+import io.github.harunobot.proto.event.type.DirectiveType;
 
 /**
  *
  * @author iTeam_VEP
  */
-public class BotEvent {
+public final class BotEvent {
     private final EventType eventType;
     private final SourceType sourceType;
-    private final SenderType senderType;
+    private final DirectiveType directiveType;
     private final BotMessage[] messages;
     private final String rawMessage;
     private final Sender sender;
@@ -31,12 +32,15 @@ public class BotEvent {
     private final String comment;
 //    private final boolean destruct;
     private final long duration;
+    private final Permission permission;
+    private final String flag;
     private final Object extendData;
+    private final long timestamp;
     
     public BotEvent(Builder builder){
         this.eventType = builder.eventType;
         this.sourceType = builder.sourceType;
-        this.senderType = builder.senderType;
+        this.directiveType = builder.directiveType;
         this.messages = builder.messages;
         this.rawMessage = builder.rawMessage;
         this.sender = builder.sender;
@@ -52,12 +56,15 @@ public class BotEvent {
         this.extendData = builder.extendData;
 //        this.destruct = builder.destruct;
         this.duration = builder.duration;
+        this.permission = builder.permission;
+        this.flag = builder.flag;
+        this.timestamp = builder.timestamp;
     }
     
     public static class Builder {
         private EventType eventType;
         private SourceType sourceType;
-        private SenderType senderType;
+        private DirectiveType directiveType;
         private BotMessage[] messages;
         private String rawMessage;
         private Sender sender;
@@ -72,7 +79,10 @@ public class BotEvent {
         private String comment;
 //        private boolean destruct;
         private long duration;
+        private Permission permission;
+        private String flag;
         private Object extendData;
+        private long timestamp;
         
         public Builder eventType(EventType eventType){
             this.eventType = eventType;
@@ -84,8 +94,8 @@ public class BotEvent {
             return this;
         }
         
-        public Builder senderType(SenderType senderType){
-            this.senderType = senderType;
+        public Builder directiveType(DirectiveType directiveType){
+            this.directiveType = directiveType;
             return this;
         }
         
@@ -158,9 +168,24 @@ public class BotEvent {
             this.duration = duration;
             return this;
         }
+        
+        public Builder permission(Permission permission){
+            this.permission = permission;
+            return this;
+        }
+        
+        public Builder flag(String flag){
+            this.flag = flag;
+            return this;
+        }
     
         public Builder extendData(Object extendData){
             this.extendData = extendData;
+            return this;
+        }
+        
+        public Builder timestamp(long timestamp){
+            this.timestamp = timestamp;
             return this;
         }
     
@@ -177,8 +202,8 @@ public class BotEvent {
         return sourceType;
     }
     
-    public SenderType senderType(){
-        return senderType;
+    public DirectiveType directiveType(){
+        return directiveType;
     }
     
     public BotMessage[] messages(){
@@ -237,8 +262,20 @@ public class BotEvent {
         return duration;
     }
     
+    public Permission permission(){
+        return permission;
+    }
+            
+    public String flag(){
+        return flag;
+    }
+    
     public Object extendData(){
         return extendData;
+    }
+    
+    public long timestamp(){
+        return timestamp;
     }
     
 }

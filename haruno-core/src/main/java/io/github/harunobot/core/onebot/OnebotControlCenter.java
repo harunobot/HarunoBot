@@ -28,6 +28,7 @@ public class OnebotControlCenter {
     private OnebotReceptionManager receptionManager;
     private OnebotTransmissionManager transmissionManager;
     private OnebotClientAdapter clientAdapter;
+//    private OnebotHttpApiClient httpApiClient;
     private Vertx vertx;
     
     private final OnebotProtoHandler protoHandler;
@@ -77,9 +78,9 @@ public class OnebotControlCenter {
         clientAdapter 
                 = new OnebotClientAdapter.Builder()
                         .authorization(connectProperties.getAuthorization())
-                        .host(connectProperties.getHost())
-                        .port(connectProperties.getPort())
-                        .uri(connectProperties.getUri())
+                        .host(connectProperties.getWsHost())
+                        .port(connectProperties.getWsPort())
+                        .uri(connectProperties.getWsUri())
                         .receptionManager(receptionManager)
                         .transmissionManager(transmissionManager)
                         .build();

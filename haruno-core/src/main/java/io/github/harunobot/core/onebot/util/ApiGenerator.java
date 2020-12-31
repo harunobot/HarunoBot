@@ -301,12 +301,14 @@ public class ApiGenerator {
         private final ParamsBuilder params = new ParamsBuilder();
         private long ssid;
         
-        public void ssid(long ssid){
+        public GetMsg ssid(long ssid){
             this.ssid = ssid;
+            return this;
         }
         
-        public void messageId(long messageId){
+        public GetMsg messageId(long messageId){
             params.messageId(messageId);
+            return this;
         }
         
         public OnebotApi build() throws HarunoIllegalArgumentException {
@@ -365,20 +367,24 @@ public class ApiGenerator {
         private final ParamsBuilder params = new ParamsBuilder();
         private long ssid;
         
-        public void ssid(long ssid){
+        public SetGroupKick ssid(long ssid){
             this.ssid = ssid;
+            return this;
         }
         
-        public void groupId(long groupId){
+        public SetGroupKick groupId(long groupId){
             params.groupId(groupId);
+            return this;
         }
         
-        public void userId(long userId){
+        public SetGroupKick userId(long userId){
             params.userId(userId);
+            return this;
         }
         
-        public void rejectAddRequest(boolean rejectAddRequest){
+        public SetGroupKick rejectAddRequest(boolean rejectAddRequest){
             params.rejectAddRequest(rejectAddRequest);
+            return this;
         }
         
         public OnebotApi build() throws HarunoIllegalArgumentException {
@@ -669,24 +675,29 @@ public class ApiGenerator {
         private final ParamsBuilder params = new ParamsBuilder();
         private long ssid;
         
-        public void ssid(long ssid){
+        public SetGroupAddRequest ssid(long ssid){
             this.ssid = ssid;
+            return this;
         }
         
-        public void flag(String flag){
+        public SetGroupAddRequest flag(String flag){
             params.flag(flag);
+            return this;
         }
         
-        public void reason(String reason){
+        public SetGroupAddRequest reason(String reason){
             params.reason(reason);
+            return this;
         }
         
-        public void subType (SubType subType){
+        public SetGroupAddRequest subType (SubType subType){
             params.subType(subType);
+            return this;
         }
         
-        public void approve(boolean approve){
+        public SetGroupAddRequest approve(boolean approve){
             params.approve(approve);
+            return this;
         }
         
         public OnebotApi build() throws HarunoIllegalArgumentException {
@@ -844,6 +855,28 @@ public class ApiGenerator {
                 throw new HarunoIllegalArgumentException();
             }
             return new OnebotApi(ApiAction.GET_GROUP_MEMBER_LIST, params.values(), ssid);
+        }
+    }
+    
+    public static class GetGroupSystemMsg   {
+        private final ParamsBuilder params = new ParamsBuilder();
+        private long ssid;
+        
+        public GetGroupSystemMsg ssid(long ssid){
+            this.ssid = ssid;
+            return this;
+        }
+        
+        public GetGroupSystemMsg groupId(long groupId){
+            params.groupId(groupId);
+            return this;
+        }
+        
+        public OnebotApi build() throws HarunoIllegalArgumentException {
+            if(params.values().size() != 1){
+                throw new HarunoIllegalArgumentException();
+            }
+            return new OnebotApi(ApiAction.GET_GROUP_SYSTEM_MSG, params.values(), ssid);
         }
     }
     

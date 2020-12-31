@@ -13,5 +13,5 @@ import io.github.harunobot.proto.request.BotRequest;
  * @author iTeam_VEP
  */
 public interface PluginHandler {
-    BotRequest handle(String trait, BotEvent event);
+    BotRequest handle(String trait, String message, BotEvent event);
 }

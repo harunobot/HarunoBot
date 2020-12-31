@@ -56,7 +56,8 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 //    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
 
-    implementation 'io.vertx:vertx-core:3.9.3'
+    implementation "io.vertx:vertx-core:${vertxVersion}"
+    implementation "io.vertx:vertx-web-client:${vertxVersion}"
 //    implementation 'io.vertx:vertx-web:3.9.3'
 //    implementation 'io.vertx:vertx-platform:2.1.6'
     implementation 'com.lmax:disruptor:3.4.2'

@@ -11,7 +11,8 @@ package io.github.harunobot.plugin.data.type;
  */
 public enum PluginTextType {
     PREFIX,
-    SUFFIX
+    FULL_MATCH,
+    REGEX
     ;
     
 }

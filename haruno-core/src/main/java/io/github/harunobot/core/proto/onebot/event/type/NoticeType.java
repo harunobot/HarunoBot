@@ -29,7 +29,11 @@ public enum NoticeType {
     @JsonProperty(value="friend_recall")
     FRIEND_RECALL,
     @JsonProperty(value="notify")
-    NOTIFY
+    NOTIFY,
+    @JsonProperty(value="group_card")
+    GROUP_CARD,
+    @JsonProperty(value="offline_file")
+    OFFLINE_FILE
     ;
     
     

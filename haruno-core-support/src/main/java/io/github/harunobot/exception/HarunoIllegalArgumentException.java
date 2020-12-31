@@ -9,6 +9,14 @@ package io.github.harunobot.exception;
  *
  * @author iTeam_VEP
  */
-public class HarunoIllegalArgumentException extends Exception {
+public class HarunoIllegalArgumentException extends IllegalArgumentException {
+    
+    public HarunoIllegalArgumentException(){
+        super();
+    }
+    
+    public HarunoIllegalArgumentException(String msg){
+        super(msg);
+    }
     
 }

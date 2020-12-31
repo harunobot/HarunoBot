@@ -5,12 +5,7 @@
  */
 package io.github.harunobot.plugin.data;
 
-import io.github.harunobot.plugin.data.type.PluginRecivevType;
-import io.github.harunobot.plugin.data.type.Permission;
-import io.github.harunobot.plugin.data.type.PluginMatcherType;
 import io.github.harunobot.plugin.data.type.PluginReceivedType;
-import io.github.harunobot.plugin.data.type.PluginTextType;
-import java.util.Set;
 
 /**
  *
@@ -19,16 +14,16 @@ import java.util.Set;
 public class PluginFilterParameter {
     private final int priority;
     private final String name;
-    private final PluginRecivevType recivevType;
+    private final PluginReceivedType receivedType;
     
-    public PluginFilterParameter(PluginRecivevType recivevType, String name, int priority){
-        this.recivevType = recivevType;
+    public PluginFilterParameter(PluginReceivedType receivedType, String name, int priority){
+        this.receivedType = receivedType;
         this.name = name;
         this.priority = priority;
     }
     
-    public PluginRecivevType recivevType(){
-        return recivevType;
+    public PluginReceivedType receivedType(){
+        return receivedType;
     }
     
     public String name(){

@@ -27,6 +27,7 @@ subprojects {
     apply plugin: 'java'
     ext {
           junitVersion = "4.12"
+          vertxVersion = "3.9.4"
     } 
     dependencies {
         testCompile("junit:junit:${junitVersion}")

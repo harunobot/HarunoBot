@@ -3,18 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package io.github.harunobot.proto.event.type;
+package io.github.harunobot.proto.response.type;
 
 /**
  *
  * @author iTeam_VEP
  */
-public enum SenderType {
-    FRIEND,
-    PUBLIC,
-    OTHER,
-    NORMAL,
-    ANONYMOUS,
-    NOTICE
-    ;
+public enum StatusType {
+    SUCCESS,
+    FAILED
 }

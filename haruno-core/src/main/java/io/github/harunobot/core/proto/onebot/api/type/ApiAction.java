@@ -36,6 +36,7 @@ public enum ApiAction {
     GET_GROUP_LIST("get_group_list"),
     GET_GROUP_MEMBER_INFO("get_group_member_info"),
     GET_GROUP_MEMBER_LIST("get_group_member_list"),
+    GET_GROUP_SYSTEM_MSG("get_group_system_msg"),
     GET_GROUP_HONOR_INFO("get_group_honor_info"),
     GET_COOKIES("get_cookies"),
     GET_CSRF_TOKEN("get_csrf_token"),

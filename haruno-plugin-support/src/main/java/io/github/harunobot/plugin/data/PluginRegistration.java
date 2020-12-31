@@ -7,7 +7,7 @@ package io.github.harunobot.plugin.data;
 
 import io.github.harunobot.plugin.PluginFilter;
 import io.github.harunobot.plugin.PluginHandler;
-import io.github.harunobot.plugin.data.type.Permission;
+import io.github.harunobot.pojo.type.Permission;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -19,12 +19,25 @@ import java.util.Set;
 public final class PluginRegistration {
     private Map<PluginHandlerMatcher, PluginHandler> handlers;
     private Map<PluginFilterParameter, PluginFilter> filters;
+    private PluginHandler interactiveHandler;
     private Set<Permission> permissions; //java.util.Collections.unmodifiableSet()
 
-    public PluginRegistration(Set<Permission> permissions, Map<PluginHandlerMatcher, PluginHandler> handlers, Map<PluginFilterParameter, PluginFilter> filters){
+    public PluginRegistration(Set<Permission> permissions
+            , Map<PluginHandlerMatcher, PluginHandler> handlers
+            , Map<PluginFilterParameter, PluginFilter> filters){
         this.permissions = permissions==null?null:Collections.unmodifiableSet(permissions);
         this.handlers = handlers;
         this.filters = filters;
+    }
+    
+    public PluginRegistration(Set<Permission> permissions
+            , Map<PluginHandlerMatcher, PluginHandler> handlers
+            , Map<PluginFilterParameter, PluginFilter> filters
+            , PluginHandler interactiveHandler){
+        this.permissions = permissions==null?null:Collections.unmodifiableSet(permissions);
+        this.handlers = handlers;
+        this.filters = filters;
+        this.interactiveHandler = interactiveHandler;
     }
     
     public Map<PluginHandlerMatcher, PluginHandler> handlers(){
@@ -37,6 +50,10 @@ public final class PluginRegistration {
     
     public Set<Permission> permissions(){
         return permissions;
+    }
+    
+    public PluginHandler interactiveHandler(){
+        return interactiveHandler;
     }
     
 }

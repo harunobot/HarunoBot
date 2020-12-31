@@ -14,6 +14,14 @@ import io.github.harunobot.core.proto.onebot.api.type.Status;
  * @author iTeam_VEP
  */
 public class OnebotApiResponse {
+    
+    private Status status;
+    private int retcode;
+//    private Map<String, Object> data;
+    private JsonNode data;
+    private long echo;
+    private String msg;
+    private String wording;
 
     /**
      * @return the status
@@ -70,9 +78,32 @@ public class OnebotApiResponse {
     public void setEcho(long echo) {
         this.echo = echo;
     }
-    private Status status;
-    private int retcode;
-//    private Map<String, Object> data;
-    private JsonNode data;
-    private long echo;
+
+    /**
+     * @return the msg
+     */
+    public String getMsg() {
+        return msg;
+    }
+
+    /**
+     * @param msg the msg to set
+     */
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    /**
+     * @return the wording
+     */
+    public String getWording() {
+        return wording;
+    }
+
+    /**
+     * @param wording the wording to set
+     */
+    public void setWording(String wording) {
+        this.wording = wording;
+    }
 }

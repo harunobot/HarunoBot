@@ -33,11 +33,11 @@ public enum SubType {
     @JsonProperty(value="leave")
     LEAVE,
     @JsonProperty(value="kick")
-    KICK,
+    KICKED,
     @JsonProperty(value="kick_me")
-    KICK_ME,
+    KICKED_ME,
     @JsonProperty(value="approve")
-    APPROVE,
+    APPROVED,
     @JsonProperty(value="invite")
     INVITE,
     @JsonProperty(value="ban")

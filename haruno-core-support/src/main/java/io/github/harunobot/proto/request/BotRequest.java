@@ -5,6 +5,7 @@
  */
 package io.github.harunobot.proto.request;
 
+import io.github.harunobot.proto.event.BotEvent;
 import io.github.harunobot.proto.event.BotMessage;
 import io.github.harunobot.proto.request.type.RequestType;
 
@@ -20,9 +21,12 @@ public class BotRequest {
     private long groupId;
     private long channelId;
     private long userId;
+    private long messageId;
     private int alivetime;
-    private boolean destruct;
     private int muteDuration;
+    private boolean approve;
+    private String info;
+    private BotEvent botEvent;
     private Object extendData;
     
     public BotRequest(Builder builder){
@@ -32,9 +36,12 @@ public class BotRequest {
         this.groupId = builder.groupId;
         this.channelId = builder.channelId;
         this.userId = builder.userId;
+        this.messageId = builder.messageId;
         this.extendData = builder.extendData;
-        this.alivetime = builder.getAlivetime();
-        this.destruct = builder.isDestruct();
+        this.alivetime = builder.alivetime;
+        this.approve = builder.approve;
+        this.info = builder.info;
+        this.botEvent = builder.botEvent;
         this.muteDuration = builder.muteDuration;
     }
     
@@ -45,9 +52,12 @@ public class BotRequest {
         private long groupId;
         private long channelId;
         private long userId;
+        private long messageId;
         private int alivetime;
-        private boolean destruct;
         private int muteDuration;
+        private boolean approve;
+        private String info;
+        private BotEvent botEvent;
         private Object extendData;
         
         public Builder requestType(RequestType requestType){
@@ -80,18 +90,33 @@ public class BotRequest {
             return this;
         }
         
-        public Builder destruct(boolean destruct){
-            this.setDestruct(destruct);
+        public Builder messageId(long messageId){
+            this.messageId = messageId;
             return this;
         }
         
         public Builder alivetime(int alivetime){
-            this.setAlivetime(alivetime);
+            this.alivetime = alivetime;
+            return this;
+        }
+        
+        public Builder approve(boolean approve){
+            this.approve = approve;
             return this;
         }
         
         public Builder muteDuration(int muteDuration){
             this.muteDuration = muteDuration;
+            return this;
+        }
+        
+        public Builder info(String info){
+            this.info = info;
+            return this;
+        }
+        
+        public Builder botEvent(BotEvent botEvent){
+            this.botEvent = botEvent;
             return this;
         }
     
@@ -102,34 +127,6 @@ public class BotRequest {
     
         public BotRequest build(){
             return new BotRequest(this);
-        }
-
-        /**
-         * @return the alivetime
-         */
-        public int getAlivetime() {
-            return alivetime;
-        }
-
-        /**
-         * @param alivetime the alivetime to set
-         */
-        public void setAlivetime(int alivetime) {
-            this.alivetime = alivetime;
-        }
-
-        /**
-         * @return the destruct
-         */
-        public boolean isDestruct() {
-            return destruct;
-        }
-
-        /**
-         * @param destruct the destruct to set
-         */
-        public void setDestruct(boolean destruct) {
-            this.destruct = destruct;
         }
     }
     
@@ -292,17 +289,59 @@ public class BotRequest {
     }
 
     /**
-     * @return the destruct
+     * @return the messageId
      */
-    public boolean isDestruct() {
-        return destruct;
+    public long getMessageId() {
+        return messageId;
     }
 
     /**
-     * @param destruct the destruct to set
+     * @param messageId the messageId to set
      */
-    public void setDestruct(boolean destruct) {
-        this.destruct = destruct;
+    public void setMessageId(long messageId) {
+        this.messageId = messageId;
+    }
+
+    /**
+     * @return the approve
+     */
+    public boolean isApprove() {
+        return approve;
+    }
+
+    /**
+     * @param approve the approve to set
+     */
+    public void setApprove(boolean approve) {
+        this.approve = approve;
+    }
+
+    /**
+     * @return the botEvent
+     */
+    public BotEvent getBotEvent() {
+        return botEvent;
+    }
+
+    /**
+     * @param botEvent the botEvent to set
+     */
+    public void setBotEvent(BotEvent botEvent) {
+        this.botEvent = botEvent;
+    }
+
+    /**
+     * @return the info
+     */
+    public String getInfo() {
+        return info;
+    }
+
+    /**
+     * @param info the info to set
+     */
+    public void setInfo(String info) {
+        this.info = info;
     }
     
 }

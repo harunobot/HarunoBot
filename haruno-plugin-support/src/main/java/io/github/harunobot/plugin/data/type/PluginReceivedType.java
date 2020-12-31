@@ -10,9 +10,8 @@ package io.github.harunobot.plugin.data.type;
  * @author iTeam_VEP
  */
 public enum PluginReceivedType {
+    PUBLIC,
     PRIVATE,
-    GROUP,
-    PRIVATE_EXT,
-    GROUP_EXT
+    BOTH
     ;
 }
