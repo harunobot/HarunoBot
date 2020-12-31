@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -32,8 +34,9 @@ public abstract class PluginLoader {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
     private final Map<String, PluginDetail> pluginDetails = new HashMap();
     private final Map<String, URLClassLoader> loaders = new HashMap();
-    private final Map<String, HarunoPlugin> plugins = new HashMap();
+    final Map<String, HarunoPlugin> plugins = new HashMap();
     
+    abstract void initPlugin(HarunoPlugin plugin);
     abstract void manageLoad(HarunoPlugin plugin, PluginRegistration registration);
     abstract void manageUnload(HarunoPlugin plugin, PluginRegistration registration);
     abstract void loadCompleted();
@@ -41,14 +44,17 @@ public abstract class PluginLoader {
     
     void load(String path, File jarFile) {
         MDC.put("module", "PluginLoader");
+        URLClassLoader classLoader = null;
 //        String id = newIdentifier();
+        ClassLoader originClassLoader = Thread.currentThread().getContextClassLoader();
         try(InputStream inputStream = new FileInputStream(jarFile);JarInputStream jarStream = new JarInputStream(inputStream)) {
             String classPath = jarStream.getManifest().getMainAttributes().getValue("Haruno-Plugin-Class").trim();
             if(classPath == null){
                 LOG.warn("jar file {} isn't a haruno plugin", jarFile.getAbsoluteFile());
                 return;
             }
-            URLClassLoader classLoader = new URLClassLoader(new URL[] { jarFile.toURI().toURL()}, new Thread().getContextClassLoader());
+            classLoader = new URLClassLoader(new URL[] { jarFile.toURI().toURL()});
+            Thread.currentThread().setContextClassLoader(classLoader);  
             Class classToLoad = Class.forName(classPath, true, classLoader);
             Constructor constructor  = classToLoad.getConstructor();
             HarunoPlugin plugin =  (HarunoPlugin) constructor.newInstance();
@@ -61,6 +67,7 @@ public abstract class PluginLoader {
 //                throw new Exception();
             }
             String id = plugin.id();
+            initPlugin(plugin);
             try{
                 synchronized(this){
                     PluginRegistration registration = plugin.onLoad(path);
@@ -79,11 +86,27 @@ public abstract class PluginLoader {
             MDC.put("module", "PluginLoader");
             LOG.error("", ex);
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
+            if(classLoader != null){
+                try {
+                    classLoader.close();
+                } catch (IOException ex1) {
+                    LOG.error("", ex1);
+                }
+            }
             MDC.put("module", "PluginLoader");
             LOG.error("", ex);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            if(classLoader != null){
+                try {
+                    classLoader.close();
+                } catch (IOException ex1) {
+                    LOG.error("", ex1);
+                }
+            }
             MDC.put("module", "PluginLoader");
             LOG.error("", ex);
+        } finally {
+            Thread.currentThread().setContextClassLoader(originClassLoader);  
         }
         MDC.clear();
     }
@@ -91,19 +114,25 @@ public abstract class PluginLoader {
     void unload(String id){
         synchronized(this){
             MDC.put("module", "PluginLoader");
-
-            try (HarunoPlugin plugin = plugins.get(id)) {
-                manageUnload(plugin, pluginDetails.get(id).getRegistration());
-                MDC.put("module", "PluginLoader");
-                loaders.get(id).close();
+            ClassLoader originClassLoader = Thread.currentThread().getContextClassLoader();
+            try (HarunoPlugin plugin = plugins.get(id); URLClassLoader loader = loaders.get(id);) {
+                Thread.currentThread().setContextClassLoader(loader);  
+                try{
+                    manageUnload(plugin, pluginDetails.get(id).getRegistration());
+                    if(plugin.onUnload()){
+                        LOG.info("plugin {} {} unloaded", plugin.description().id(), plugin.description().version());
+                    } else {
+                        LOG.info("plugin {} {} unload failed", plugin.description().id(), plugin.description().version());
+                    }
+                } catch(Exception ex){
+                    LOG.error("plugin {} execute unload failed", plugin.id(), ex);
+                }
                 pluginDetails.remove(id);
                 plugins.remove(id);
                 loaders.remove(id);
-                if(plugin.onUnload()){
-                    LOG.info("plugin {} {} unloaded", plugin.description().id(), plugin.description().version());
-                } else {
-                    LOG.info("plugin {} {} unload failed", plugin.description().id(), plugin.description().version());
-                }
+                
+                Thread.currentThread().setContextClassLoader(originClassLoader);  
+                return;
             } catch (IOException ex) {
                 MDC.put("module", "PluginLoader");
                 LOG.error("unload failed", ex);
@@ -111,7 +140,7 @@ public abstract class PluginLoader {
                 MDC.put("module", "PluginLoader");
                 LOG.error("unload failed", ex);
             }
-            MDC.clear();
+            Thread.currentThread().setContextClassLoader(originClassLoader);  
         }
     }
     

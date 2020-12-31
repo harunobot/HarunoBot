@@ -6,7 +6,7 @@
 package io.github.harunobot.plugin.data;
 
 import io.github.harunobot.plugin.data.type.BlockType;
-import io.github.harunobot.plugin.data.type.Permission;
+import io.github.harunobot.pojo.type.Permission;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;

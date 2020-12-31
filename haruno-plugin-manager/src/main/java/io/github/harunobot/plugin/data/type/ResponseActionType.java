@@ -10,6 +10,7 @@ package io.github.harunobot.plugin.data.type;
  * @author iTeam_VEP
  */
 public enum ResponseActionType {
+    CALLBACK,
     DELETE,
     ;
 }

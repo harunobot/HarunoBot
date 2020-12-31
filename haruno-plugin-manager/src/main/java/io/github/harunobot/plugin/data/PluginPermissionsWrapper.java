@@ -8,7 +8,7 @@ package io.github.harunobot.plugin.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.harunobot.console.configuration.PluginPermissionProperties;
 import io.github.harunobot.plugin.data.type.BlockType;
-import io.github.harunobot.plugin.data.type.Permission;
+import io.github.harunobot.pojo.type.Permission;
 import java.util.Map;
 import java.util.Set;
 

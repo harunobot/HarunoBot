@@ -6,7 +6,7 @@
 package io.github.harunobot.plugin.data;
 
 import io.github.harunobot.plugin.PluginFilter;
-import io.github.harunobot.plugin.data.type.PluginRecivevType;
+import io.github.harunobot.plugin.data.type.PluginReceivedType;
 
 /**
  *
@@ -16,7 +16,7 @@ public class PluginFilterWrapper extends PluginWrapper {
     private final PluginFilter filter;
     private final int priority;
     
-    public PluginFilterWrapper(String id, PluginRecivevType recivevType, PluginAccessControlWrapper acl, int priority, PluginFilter filter){
+    public PluginFilterWrapper(String id, PluginReceivedType recivevType, PluginAccessControlWrapper acl, int priority, PluginFilter filter){
         super(id, recivevType, acl);
         this.priority = priority;
         this.filter = filter;

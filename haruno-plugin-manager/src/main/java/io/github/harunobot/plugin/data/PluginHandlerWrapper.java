@@ -5,8 +5,10 @@
  */
 package io.github.harunobot.plugin.data;
 
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RunAutomaton;
 import io.github.harunobot.plugin.PluginHandler;
-import io.github.harunobot.plugin.data.type.PluginRecivevType;
+import io.github.harunobot.plugin.data.type.PluginReceivedType;
 
 /**
  *
@@ -14,14 +16,44 @@ import io.github.harunobot.plugin.data.type.PluginRecivevType;
  */
 public class PluginHandlerWrapper extends PluginWrapper {
     private final PluginHandler handler;
+    private RunAutomaton regex;
+    private String trait;
     
-    public PluginHandlerWrapper(String id, PluginRecivevType recivevType, PluginAccessControlWrapper acl, PluginHandler handler){
+    public PluginHandlerWrapper(String id, PluginReceivedType recivevType, PluginAccessControlWrapper acl, PluginHandler handler){
         super(id, recivevType, acl);
         this.handler = handler;
     }
     
     public PluginHandler handler(){
         return handler;
+    }
+
+    /**
+     * @return the regex
+     */
+    public RunAutomaton getRegex() {
+        return regex;
+    }
+
+    /**
+     * @param regex the regex to set
+     */
+    public void setRegex(RunAutomaton regex) {
+        this.regex = regex;
+    }
+
+    /**
+     * @return the trait
+     */
+    public String getTrait() {
+        return trait;
+    }
+
+    /**
+     * @param trait the trait to set
+     */
+    public void setTrait(String trait) {
+        this.trait = trait;
     }
     
 }

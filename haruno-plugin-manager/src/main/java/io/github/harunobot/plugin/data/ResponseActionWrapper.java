@@ -5,28 +5,35 @@
  */
 package io.github.harunobot.plugin.data;
 
+import io.github.harunobot.async.BotResponseCallback;
 import io.github.harunobot.plugin.data.type.ResponseActionType;
+import io.github.harunobot.proto.request.type.RequestType;
 
 /**
  *
  * @author iTeam_VEP
  */
-public class ResponseActionWrapper {
+public class ResponseActionWrapper<T> {
     private long serialId;
     private String pluginId;
+    private RequestType requestType;
     private ResponseActionType action;
+    private BotResponseCallback<T> callback;
     private int duration;
     
     public ResponseActionWrapper(long serialId, int duration){
         this.serialId = serialId;
         this.duration = duration;
+        this.requestType = RequestType.DELETE;
         this.action = ResponseActionType.DELETE;
     }
     
-    public ResponseActionWrapper(long serialId, String pluginId, ResponseActionType action){
+    public ResponseActionWrapper(long serialId, String pluginId, RequestType requestType, BotResponseCallback<T> callback){
         this.serialId = serialId;
         this.pluginId = pluginId;
-        this.action = action;
+        this.requestType = requestType;
+        this.action = ResponseActionType.CALLBACK;
+        this.callback = callback;
     }
 
     /**
@@ -83,5 +90,33 @@ public class ResponseActionWrapper {
      */
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+
+    /**
+     * @return the requestType
+     */
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    /**
+     * @param requestType the requestType to set
+     */
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
+    }
+
+    /**
+     * @return the callback
+     */
+    public BotResponseCallback<T> getCallback() {
+        return callback;
+    }
+
+    /**
+     * @param callback the callback to set
+     */
+    public void setCallback(BotResponseCallback<T> callback) {
+        this.callback = callback;
     }
 }

@@ -6,7 +6,7 @@
 package io.github.harunobot.console.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.harunobot.plugin.data.type.Permission;
+import io.github.harunobot.pojo.type.Permission;
 import java.util.Map;
 import java.util.Set;
 

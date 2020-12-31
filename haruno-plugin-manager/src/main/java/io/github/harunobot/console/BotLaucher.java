@@ -5,30 +5,12 @@
  */
 package io.github.harunobot.console;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.github.harunobot.core.onebot.OnebotControlCenter;
-import io.github.harunobot.plugin.onebot.PluginManager;
-import io.github.harunobot.core.onebot.config.OnebotConnectProperties;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.util.DaemonThreadFactory;
-import io.github.harunobot.console.configuration.BotProperties;
-import io.github.harunobot.core.onebot.OnebotApiHandler;
-import io.github.harunobot.core.onebot.OnebotApiResponseHandler;
-import io.github.harunobot.core.onebot.OnebotEventHandler;
-import io.github.harunobot.core.onebot.OnebotReceptionManager;
-import io.github.harunobot.core.onebot.OnebotTransmissionManager;
-import io.github.harunobot.core.onebot.adapter.OnebotClientAdapter;
-import io.github.harunobot.core.proto.onebot.api.OnebotApiResponse;
-import io.github.harunobot.core.proto.onebot.event.OnebotEvent;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.MultiMap;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Launcher;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
+import io.vertx.core.json.JsonObject;
+import java.util.concurrent.TimeUnit;
 import org.iharu.util.JsonUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -37,120 +19,71 @@ import org.slf4j.MDC;
  *
  * @author iTeam_VEP
  */
-public class BotLaucher extends AbstractVerticle {
+public class BotLaucher extends Launcher {
     private final org.slf4j.Logger LOG = LoggerFactory.getLogger(BotLaucher.class);
     
-    private Disruptor<OnebotEvent> eventDisruptor;
-    private Disruptor<OnebotApiResponse> apiResponseDisruptor;
-    private Disruptor<StringBuilder> apiDisruptor;
-    private OnebotEventHandler eventHandler;
-    private OnebotApiResponseHandler apiResponseHandler;
-    private OnebotApiHandler apiHandler;
-    private OnebotReceptionManager receptionManager;
-    private OnebotTransmissionManager transmissionManager;
-    private OnebotClientAdapter clientAdapter;
-    private PluginManager pluginManger;
-    private String workFolder;
-    private BotProperties properties;
-    
-//    public static void main(String[] args){
-//        
-//    }
-    
-    @Override
-    public void start() {
-        MDC.put("module", "Laucher");
-        try {
-            environment();
-            configure();
-            vertx.deployVerticle(clientAdapter);
-            plugin();
-        } catch (IOException ex) {
-            LOG.error("", ex);
-            vertx.close();
-            System.exit(-1);
-        }
-        MDC.put("module", "Laucher");
-        LOG.info("Harubot startup...");
-//        MDC.clear();
+    public static void main(String[] args) {
+//        https://zhuanlan.zhihu.com/p/30913753
+//        System.getProperties().setProperty("vertx.disableDnsResolver","true"); 
+        new BotLaucher().dispatch(args);
     }
-    
-    @Override
-    public void stop(){
-        MDC.put("module", "Laucher");
-        pluginManger.unloadPlugins();
-        eventDisruptor.shutdown();
-        apiResponseDisruptor.shutdown();
-        apiDisruptor.shutdown();
-    }
-    
-    private void plugin(){
-        if(properties.getPlugin().getPluginFolder() != null){
-            for(String folder:properties.getPlugin().getPluginFolder()){
-                pluginManger.loadPlugins(new File(folder));
-            }
-        }
-        pluginManger.activePlugins();
-    }
-    
-    private void configure(){
-        pluginManger = new PluginManager();
-//        pluginManger.loadPlugins(new File("L:\\NetBeans\\NetBeansProjects\\Haruno-Admin-Plugin\\build\\libs"));
-//        pluginManger.loadPlugins(new File("L:\\NetBeans\\NetBeansProjects\\HarunoPlugins\\Kancolle-Chart-Assistant-Plugin\\build\\libs"));
-        
-        eventHandler = new OnebotEventHandler(pluginManger);
-        apiResponseHandler = new OnebotApiResponseHandler(pluginManger);
-        apiHandler = new OnebotApiHandler();
-        
-        int bufferSize = 1024;
-        eventDisruptor = new Disruptor(OnebotEvent::new, bufferSize, DaemonThreadFactory.INSTANCE);
-        eventDisruptor.handleEventsWith(eventHandler);
-        eventDisruptor.start();
-        
-        apiResponseDisruptor = new Disruptor(OnebotApiResponse::new, bufferSize, DaemonThreadFactory.INSTANCE);
-        apiResponseDisruptor.handleEventsWith(apiResponseHandler);
-        apiResponseDisruptor.start();
-        
-        apiDisruptor = new Disruptor(StringBuilder::new, bufferSize, DaemonThreadFactory.INSTANCE);
-        apiDisruptor.handleEventsWith(apiHandler);
-        apiDisruptor.start();
 
-        receptionManager 
-                = new OnebotReceptionManager.Builder()
-                        .eventRingBuffer(eventDisruptor.getRingBuffer())
-                        .apiResponseBuffer(apiResponseDisruptor.getRingBuffer())
-                        .eventHandler(eventHandler)
-                        .apiResponseHandler(apiResponseHandler)
-//                        .pluginManger(pluginManger)
-                        .build();
-        transmissionManager 
-                = new OnebotTransmissionManager.Builder()
-                        .apiBuffer(apiDisruptor.getRingBuffer())
-                        .apiHandler(apiHandler)
-                        .build();
-        pluginManger.setTransmitter(transmissionManager);
-        OnebotConnectProperties connectProperties = properties.getOnebotConnection();
-        clientAdapter 
-                = new OnebotClientAdapter.Builder()
-                        .authorization(connectProperties.getAuthorization())
-                        .host(connectProperties.getHost())
-                        .port(connectProperties.getPort())
-                        .uri(connectProperties.getUri())
-                        .receptionManager(receptionManager)
-                        .transmissionManager(transmissionManager)
-                        .build();
+    @Override
+    public void afterConfigParsed(JsonObject jo) {
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot config: {}", JsonUtils.objectToJson(jo));
     }
-    
-    private void environment() throws IOException{
-        workFolder = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
-        LOG.info("workFolder: {}", workFolder);
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).enable(SerializationFeature.INDENT_OUTPUT);
-        properties = JsonUtils.jsonToObject(
-                Files.readString(
-                        FileSystems.getDefault().getPath("config.yml")
-                        , StandardCharsets.UTF_8)
-                , BotProperties.class
-                ,mapper);
+
+    @Override
+    public void beforeStartingVertx(VertxOptions options) {
+//        options.setWorkerPoolSize(100);
+        // check for blocked threads every 5s
+        options.setBlockedThreadCheckInterval(5);
+        options.setBlockedThreadCheckIntervalUnit(TimeUnit.SECONDS);
+
+        // warn if an event loop thread handler took more than 100ms to execute
+        options.setMaxEventLoopExecuteTime(200);
+        options.setMaxEventLoopExecuteTimeUnit(TimeUnit.MILLISECONDS);
+
+        // warn if an worker thread handler took more than 10s to execute
+        options.setMaxWorkerExecuteTime(10);
+        options.setMaxWorkerExecuteTimeUnit(TimeUnit.SECONDS);
+
+         // log the stack trace if an event loop or worker handler took more than 20s to execute
+        options.setWarningExceptionTime(30);
+        options.setWarningExceptionTimeUnit(TimeUnit.SECONDS);
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot configured");
+    }
+
+    @Override
+    public void afterStartingVertx(Vertx vertx) {
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot started");
+    }
+
+    @Override
+    public void beforeDeployingVerticle(DeploymentOptions d) {
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot deploying verticle {}", JsonUtils.objectToJson(d.getConfig()));
+    }
+
+    @Override
+    public void beforeStoppingVertx(Vertx vertx) {
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot stopping");
+    }
+
+    @Override
+    public void afterStoppingVertx() {
+        MDC.put("module", "Laucher");
+        LOG.info("Harunobot stopped");
+    }
+
+    @Override
+    public void handleDeployFailed(Vertx vertx, String string, DeploymentOptions d, Throwable thrwbl) {
+        MDC.put("module", "Laucher");
+        LOG.error("Harunobot laucher failed {}", string, thrwbl);
     }
     
 }
