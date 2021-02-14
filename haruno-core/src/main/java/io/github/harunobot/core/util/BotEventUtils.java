@@ -210,11 +210,13 @@ public class BotEventUtils {
             case GROUP_BAN:
                 break;
             case GROUP_RECALL:
+                builder.permission(Permission.PUBLIC_DELETE_NOTICE);
                 break;
             case FRIEND_ADD:
                 privSource = true;
                 break;
             case FRIEND_RECALL:
+                builder.permission(Permission.PRIVATE_DELETE_NOTICE);
                 privSource = true;
                 break;
             case NOTIFY:
@@ -261,6 +263,7 @@ public class BotEventUtils {
                     break;
             }
         }
+        builder.sourceType(privSource?SourceType.PRIVATE:SourceType.PUBLIC);
         builder.rawMessage(event.getRawMessage());
         return builder.build();
     }

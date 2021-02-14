@@ -371,13 +371,17 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
             if(message == null){
                 return;
             }
-            if(message.getType() == ArrayMessageDataType.AT && selfIds.contains(Long.valueOf((String) message.getData().get("qq")))){
-                atHandlers.forEach(plugin -> {
-                    if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
-                        return;
-                    }
-                    pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, null, botEvent)));
-                });
+            if(message.getType() == ArrayMessageDataType.AT){
+                if("all".equals(message.getData().get("qq"))){
+                    
+                } else if(selfIds.contains(Long.valueOf((String) message.getData().get("qq")))){
+                    atHandlers.forEach(plugin -> {
+                        if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
+                            return;
+                        }
+                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, null, botEvent)));
+                    });
+                }
             }
             if(message.getType() == ArrayMessageDataType.TEXT){
                 String msg = ((String) message.getData().get(ArrayMessageDataType.TEXT.key()[0])).trim();
