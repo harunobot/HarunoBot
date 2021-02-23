@@ -11,6 +11,7 @@ package io.github.harunobot.plugin.data.type;
  */
 public enum PluginMatcherType {
     TEXT,
+    COMMAND,
     IMAGE,
     TOME
     ;

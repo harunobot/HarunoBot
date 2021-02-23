@@ -18,12 +18,22 @@ public class PluginHandlerMatcher {
     private final PluginMatcherType matcherType;
     private final PluginReceivedType recivevType;
     private final String trait;
+    private final String splitRegex;
     
     public PluginHandlerMatcher(PluginReceivedType recivevType, PluginMatcherType matcherType, PluginTextType textType, String trait){
         this.recivevType = recivevType;
         this.textType = textType;
         this.matcherType = matcherType;
         this.trait = trait;
+        this.splitRegex = null;
+    }
+    
+    public PluginHandlerMatcher(PluginReceivedType recivevType, String trait, String splitRegex){
+        this.recivevType = recivevType;
+        this.textType = null;
+        this.matcherType = PluginMatcherType.COMMAND;
+        this.trait = trait;
+        this.splitRegex = splitRegex;
     }
     
     public PluginReceivedType recivevType(){
@@ -40,6 +50,10 @@ public class PluginHandlerMatcher {
     
     public String trait(){
         return trait;
+    }
+    
+    public String splitRegex(){
+        return splitRegex;
     }
     
 }

@@ -100,7 +100,7 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
     
     private final ExecutorService pluginPool = Executors.newCachedThreadPool();
     
-    private Map<String, List<PluginHandlerWrapper>> textPrefixHandlers = new HashMap();
+    private Map<String, List<PluginHandlerWrapper>> commandHandlers = new HashMap();
     private Map<String, List<PluginHandlerWrapper>> textFullMatchHandlers = new HashMap();
     private List<PluginHandlerWrapper> textRegexHandlers = new ArrayList();
     private List<PluginHandlerWrapper> imageHandlers = new ArrayList();
@@ -185,10 +185,10 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
         if(registration.handlers() != null){
             registration.handlers().forEach((matcher, handler) -> {
                 switch(matcher.matcherType()){
+                    case COMMAND:
+                        unloadHandler(pluginId, commandHandlers.get(matcher.trait()));
+                        break;
                     case TEXT:
-                        if(matcher.textType() == PluginTextType.PREFIX){
-                            unloadHandler(pluginId, textPrefixHandlers.get(matcher.trait()));
-                        }
                         if(matcher.textType() == PluginTextType.FULL_MATCH){
                             unloadHandler(pluginId, textFullMatchHandlers.get(matcher.trait()));
                         }
@@ -259,26 +259,28 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
         if(registration.handlers() != null){
             registration.handlers().forEach((matcher, handler) -> {
                 switch(matcher.matcherType()){
-                    case TEXT:
+                    case COMMAND:
                         String trait = matcher.trait();
-                        if(matcher.textType() == PluginTextType.PREFIX){
-                            if(!textPrefixHandlers.containsKey(trait)){
-                                textPrefixHandlers.put(trait, new ArrayList());
-                            }
-                            PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
-                            wrapper.setTrait(trait);
-                            textPrefixHandlers.get(trait).add(wrapper);
+                        if(!commandHandlers.containsKey(trait)){
+                            commandHandlers.put(trait, new ArrayList());
                         }
+                        PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                        wrapper.setTrait(trait);
+                        wrapper.setSplitRegex(matcher.splitRegex());
+                        commandHandlers.get(trait).add(wrapper);
+                        break;
+                    case TEXT:
+                        trait = matcher.trait();
                         if(matcher.textType() == PluginTextType.FULL_MATCH){
                             if(!textFullMatchHandlers.containsKey(trait)){
                                 textFullMatchHandlers.put(trait, new ArrayList());
                             }
-                            PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                            wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
                             wrapper.setTrait(trait);
                             textFullMatchHandlers.get(trait).add(wrapper);
                         }
                         if(matcher.textType() == PluginTextType.REGEX){
-                            PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                            wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
                             wrapper.setRegex(new RunAutomaton(new RegExp(trait).toAutomaton()));
                             textFullMatchHandlers.get(trait).add(wrapper);
                         }
@@ -379,36 +381,48 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
                         if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
                             return;
                         }
-                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, null, botEvent)));
+                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, botEvent)));
                     });
                 }
             }
             if(message.getType() == ArrayMessageDataType.TEXT){
                 String msg = ((String) message.getData().get(ArrayMessageDataType.TEXT.key()[0])).trim();
-                if(textFullMatchHandlers.containsKey(msg)){
-                    textFullMatchHandlers.get(msg).forEach(plugin -> {
-                        if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
-                            return;
-                        }
-                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(plugin.getTrait(), msg, botEvent)));
-                    });
-                }
-                textPrefixHandlers.forEach((trait, plugins) -> {
+                commandHandlers.forEach((trait, plugins) -> {
                     if(msg.startsWith(trait)){
                         plugins.forEach(plugin -> {
                             if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
                                 return;
                             }
-                            pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(trait, msg, botEvent)));
+                            if(plugin.getSplitRegex() == null){
+                                pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(msg.substring(msg.indexOf(trait)+trait.length()), botEvent)));
+                            } else {
+                                String[] commands = msg.split(plugin.getSplitRegex(), 2);
+                                if(!trait.equals(commands[0])){
+                                    return;
+                                }
+                                if(commands.length != 2){
+                                    pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, botEvent)));
+                                } else {
+                                    pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle("".equals(commands[1])?null:commands[1], botEvent)));
+                                }
+                            }
                         });
                     }
                 });
+                if(textFullMatchHandlers.containsKey(msg)){
+                    textFullMatchHandlers.get(msg).forEach(plugin -> {
+                        if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
+                            return;
+                        }
+                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(msg, botEvent)));
+                    });
+                }
                 textRegexHandlers.forEach(plugin -> {
                     if(plugin.getRegex().run(msg)){
                         if(!plugin.allow(recivevType, permission, event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
                             return;
                         }
-                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(plugin.getTrait(), msg, botEvent)));
+                        pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(msg, botEvent)));
                     }
                 });
             }
@@ -490,7 +504,7 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
                     , botEvent.permission(), event.getGroupId(), PluginAccessControlConstant.GLOBAL_ID.value(), event.getUserId())){
                 return;
             }
-            pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, null, botEvent)));
+            pluginPool.execute(() -> handleBotRequest(plugin.id(), botEvent, plugin.handler().handle(null, botEvent)));
         });
     }
     

@@ -5,7 +5,6 @@
  */
 package io.github.harunobot.plugin.data;
 
-import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RunAutomaton;
 import io.github.harunobot.plugin.PluginHandler;
 import io.github.harunobot.plugin.data.type.PluginReceivedType;
@@ -18,6 +17,7 @@ public class PluginHandlerWrapper extends PluginWrapper {
     private final PluginHandler handler;
     private RunAutomaton regex;
     private String trait;
+    private String splitRegex;
     
     public PluginHandlerWrapper(String id, PluginReceivedType recivevType, PluginAccessControlWrapper acl, PluginHandler handler){
         super(id, recivevType, acl);
@@ -54,6 +54,20 @@ public class PluginHandlerWrapper extends PluginWrapper {
      */
     public void setTrait(String trait) {
         this.trait = trait;
+    }
+
+    /**
+     * @return the splitRegex
+     */
+    public String getSplitRegex() {
+        return splitRegex;
+    }
+
+    /**
+     * @param splitRegex the splitRegex to set
+     */
+    public void setSplitRegex(String splitRegex) {
+        this.splitRegex = splitRegex;
     }
     
 }
