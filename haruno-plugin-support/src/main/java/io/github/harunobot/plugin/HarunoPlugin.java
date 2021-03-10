@@ -286,6 +286,16 @@ public abstract class HarunoPlugin implements AutoCloseable {
         );
     }
     
+    protected final void deleteMessage(long messageId){
+        pluginSupport.sendBotRequest(
+                id,
+                new BotRequest.Builder()
+                    .messageId(messageId)
+                    .requestType(RequestType.DELETE)
+                    .build()
+        );
+    }
+    
     protected final long getReplySourceMessageId(BotEvent event){
         for(BotMessage botMessage:event.messages()){
             if(botMessage.messageType() == MessageContentType.REPLY){
