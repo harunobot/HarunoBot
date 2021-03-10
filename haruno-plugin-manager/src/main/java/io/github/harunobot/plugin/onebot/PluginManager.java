@@ -264,7 +264,7 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
                         if(!commandHandlers.containsKey(trait)){
                             commandHandlers.put(trait, new ArrayList());
                         }
-                        PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                        PluginHandlerWrapper wrapper = new PluginHandlerWrapper(pluginId, matcher.receivedType(), aclWrapper, handler);
                         wrapper.setTrait(trait);
                         wrapper.setSplitRegex(matcher.splitRegex());
                         commandHandlers.get(trait).add(wrapper);
@@ -275,12 +275,12 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
                             if(!textFullMatchHandlers.containsKey(trait)){
                                 textFullMatchHandlers.put(trait, new ArrayList());
                             }
-                            wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                            wrapper = new PluginHandlerWrapper(pluginId, matcher.receivedType(), aclWrapper, handler);
                             wrapper.setTrait(trait);
                             textFullMatchHandlers.get(trait).add(wrapper);
                         }
                         if(matcher.textType() == PluginTextType.REGEX){
-                            wrapper = new PluginHandlerWrapper(pluginId, matcher.recivevType(), aclWrapper, handler);
+                            wrapper = new PluginHandlerWrapper(pluginId, matcher.receivedType(), aclWrapper, handler);
                             wrapper.setRegex(new RunAutomaton(new RegExp(trait).toAutomaton()));
                             textFullMatchHandlers.get(trait).add(wrapper);
                         }
@@ -345,11 +345,20 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
     }
     
     private void handleMessage(OnebotEvent event, PluginReceivedType recivevType, Permission permission){
-        BotEvent botEvent = BotEventUtils.convertMessage(event);
-        if(botEvent.messages() == null){
-            LOG.error("messages is empty {}", JsonUtils.objectToJson(event));
+        BotEvent _botEvent;
+        try{
+            _botEvent = BotEventUtils.convertMessage(event);
+            if(_botEvent.messages() == null){
+                LOG.error("messages is empty {}", JsonUtils.objectToJson(event));
+                return;
+            }
+        }catch(ClassCastException ex){
+            LOG.error("message convert failed. {}", JsonUtils.objectToJson(event), ex);
+            return;
         }
+        
         long group = event.getGroupId();
+        final BotEvent botEvent = _botEvent;
         
         messagePool.executeBlocking((Promise<Boolean> promise) -> {
             if(!pluginFilters.isEmpty()) {
@@ -635,6 +644,9 @@ public class PluginManager extends PluginLoader implements HarunoPluginSupport, 
             }
             if(request.getRequestType() == RequestType.KICK_MEMBER){
                 handleApiRequest(new ApiGenerator.SetGroupKick().ssid(sid).groupId(request.getGroupId()).userId(request.getUserId()).rejectAddRequest(request.isApprove()).build());
+            }
+            if(request.getRequestType() == RequestType.DELETE){
+                handleApiRequest(new ApiGenerator.DeleteMsg().ssid(-1).messageId(request.getMessageId()).build());
             }
             if(request.getRequestType() == RequestType.HANDLE_SOCIAL_ADD_REQUEST){
                 if(request.getBotEvent().directiveType() == DirectiveType.PUBLIC_ADD_REQUEST){

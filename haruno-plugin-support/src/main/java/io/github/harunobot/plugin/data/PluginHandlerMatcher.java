@@ -16,28 +16,28 @@ import io.github.harunobot.plugin.data.type.PluginTextType;
 public class PluginHandlerMatcher {
     private final PluginTextType textType;
     private final PluginMatcherType matcherType;
-    private final PluginReceivedType recivevType;
+    private final PluginReceivedType receivedType;
     private final String trait;
     private final String splitRegex;
     
-    public PluginHandlerMatcher(PluginReceivedType recivevType, PluginMatcherType matcherType, PluginTextType textType, String trait){
-        this.recivevType = recivevType;
+    public PluginHandlerMatcher(PluginReceivedType receivedType, PluginMatcherType matcherType, PluginTextType textType, String trait){
+        this.receivedType = receivedType;
         this.textType = textType;
         this.matcherType = matcherType;
         this.trait = trait;
         this.splitRegex = null;
     }
     
-    public PluginHandlerMatcher(PluginReceivedType recivevType, String trait, String splitRegex){
-        this.recivevType = recivevType;
+    public PluginHandlerMatcher(PluginReceivedType receivedType, String trait, String splitRegex){
+        this.receivedType = receivedType;
         this.textType = null;
         this.matcherType = PluginMatcherType.COMMAND;
         this.trait = trait;
         this.splitRegex = splitRegex;
     }
     
-    public PluginReceivedType recivevType(){
-        return recivevType;
+    public PluginReceivedType receivedType(){
+        return receivedType;
     }
     
     public PluginTextType textType(){
