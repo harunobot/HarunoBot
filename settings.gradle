@@ -5,4 +5,5 @@ include ':haruno-core-support'
 include ':haruno-plugin-manager'
 include ':haruno-plugin-support'
 include ':haruno-database-support'
+include ':haruno-annotation-support'
 
