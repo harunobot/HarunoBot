@@ -48,6 +48,7 @@ dependencies {
     
     implementation project(":haruno-core")
     implementation project(":haruno-core-support")
+    implementation project(":haruno-annotation-support")
     implementation project(":haruno-plugin-support")
 //    implementation project(":haruno-database-support")
     
